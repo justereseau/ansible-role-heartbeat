@@ -1,8 +1,5 @@
 # nephelaiio.heartbeat
 
-[![Build Status](https://github.com/nephelaiio/ansible-role-heartbeat/workflows/CI/badge.svg)](https://github.com/nephelaiio/ansible-role-heartbeat/actions)
-[![Ansible Galaxy](http://img.shields.io/badge/ansible--galaxy-nephelaiio.heartbeat-blue.svg)](https://galaxy.ansible.com/nephelaiio/heartbeat/)
-
 An [ansible role](https://galaxy.ansible.com/nephelaiio/heartbeat) to install and configure heartbeat
 
 ## Role Variables
@@ -22,28 +19,6 @@ Please review the [dependency configuration](/meta/main.yml) for more details
   vars:
     heartbeat_package_state: latest
     heartbeat_conf_manage: yes
-    heartbeat_conf:
-      heartbeat:
-        monitors:
-          - type: http
-            schedule: '*/1 * * * * * *'
-            urls:
-              - "https://www.google.com"
-              - "https://www.amazon.com"
-      output:
-        elasticsearch:
-          enabled: true
-          hosts:
-            - http://localhost:9200
-      setup:
-        dashboards:
-          enabled: true
-          beat: heartbeat
-          always_kibana: true
-        template:
-          enabled: true
-        kibana:
-          host: http://localhost:80
   roles:
      - role: nephelaiio.heartbeat
 ```
@@ -54,7 +29,12 @@ Please review the [dependency configuration](/meta/main.yml) for more details
 - hosts: servers
   vars:
     heartbeat_package_state: latest
-    heartbeat_conf_file: ./my-heartbeat-config.yml
+    heartbeat_conf_path: /etc/ha.d/ha.cf
+    heartbeat_haressources_path: /etc/ha.d/haresources
+    heartbeat_authkey_path: /etc/ha.d/authkeys
+    heartbeat_conf_file: "{{ config_files_dir }}/ha.cf.j2"
+    heartbeat_haressources_file: "{{ config_files_dir }}/haressources.j2"
+    heartbeat_authkey_file: "{{ config_files_dir }}/authkey.j2"
   roles:
      - role: nephelaiio.heartbeat
 ```
