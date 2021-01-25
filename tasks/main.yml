@@ -1,9 +1,4 @@
 ---
-- name: configure elastic repo
-  include_role:
-    name: nephelaiio.elastic_repo
-  when: heartbeat_repo_manage | bool
-
 - block:
 
     - name: install yum version lock support
@@ -50,23 +45,19 @@
 
   when: heartbeat_package_hold | bool
 
-- name: configure heartbeat
-  copy:
-    content: |
-      # Ansible managed
-
-      {{ heartbeat_conf | to_nice_yaml(indent=2) }}
-    dest: "{{ heartbeat_conf_path }}"
+- name: configure authkey
+  template:
+    src: "{{ heartbeat_authkey_file }}"
+    dest: "{{ heartbeat_authkey_path }}"
     owner: root
     group: root
     mode: 0600
   notify: restart heartbeat
   when:
-    - heartbeat_conf is defined
-    - heartbeat_conf_manage | bool
+    - heartbeat_authkey_file is defined
 
-- name: copy heartbeat configuration file
-  copy:
+- name: configure heartbeat
+  template:
     src: "{{ heartbeat_conf_file }}"
     dest: "{{ heartbeat_conf_path }}"
     owner: root
@@ -75,7 +66,17 @@
   notify: restart heartbeat
   when:
     - heartbeat_conf_file is defined
-    - heartbeat_conf_manage | bool
+
+- name: configure haressources
+  template:
+    src: "{{ heartbeat_haressources_file }}"
+    dest: "{{ heartbeat_haressources_path }}"
+    owner: root
+    group: root
+    mode: 0600
+  notify: restart heartbeat
+  when:
+    - heartbeat_haressources_file is defined
 
 - name: manage heartbeat services
   service:
